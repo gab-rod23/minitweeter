@@ -2,12 +2,15 @@ package impl
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/gab-rod23/minitweeter/database/mongodb"
 	"github.com/gab-rod23/minitweeter/tweets/entities/dto"
 	"github.com/gab-rod23/minitweeter/tweets/entities/model"
 	"github.com/gab-rod23/minitweeter/tweets/repository"
 	"go.mongodb.org/mongo-driver/bson"
+
+	//	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -43,18 +46,32 @@ func (t tweetRepository) FindTweetsFromUsers(timelineData *dto.TimelineTweetData
 	sortOptions := options.Find()
 	sortOptions.SetSort(bson.D{{"created_date", -1}})
 
-	conditions := bson.D{}
+	usernameList := bson.A{}
 	for _, user := range followingUsers {
-		conditions = append(conditions, bson.E{Key: "username", Value: user})
+		usernameList = append(usernameList, bson.D{{"username", user}})
 	}
-	cur, err := tweetCollection.Find(context.TODO(), conditions, &pageOptions, sortOptions)
+	fmt.Println(usernameList)
+	filterUsernames := bson.D{{"$or", usernameList}}
+	//var filters primitive.D
+	// if timelineData.LastPageTweetDate != nil {
+	// 	lowerDateFilter := bson.D{{"created_date", bson.D{{"$lt", timelineData.LastPageTweetDate}}}}
+	// 	filters = bson.D{{"$and", bson.A{lowerDateFilter, filterUsernames}}}
+	// } else {
+	// 	filters = filterUsernames
+	// }
+
+	//cur, err := tweetCollection.Find(context.TODO(), filters, &pageOptions, sortOptions)
+	fmt.Println(pageOptions)
+	cur, err := tweetCollection.Find(context.TODO(), filterUsernames, &pageOptions, sortOptions)
 	if err != nil {
 		return nil, err
 	}
 	result := new([]model.TweetModelCollection)
+	fmt.Println(cur)
 	err = cur.All(context.TODO(), result)
 	if err != nil {
 		return nil, err
 	}
+	fmt.Print(result)
 	return *result, nil
 }

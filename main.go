@@ -32,6 +32,7 @@ func main() {
 	tweetRouterGroup := r.Group("/tweet")
 	{
 		tweetRouterGroup.POST("/create", tweetController.HandlerCreateNewTweet)
+		tweetRouterGroup.GET("/timeline", tweetController.HandlerRetrieveTimelineTweet)
 	}
 
 	r.Run("localhost:8080") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")

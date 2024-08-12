@@ -40,7 +40,11 @@ func (t tweetController) HandlerRetrieveTimelineTweet(ctx *gin.Context) {
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 	}
-	t.tweetUsecase.RetrieveTimelineTweet(timelineTweetData)
+	timeline, err := t.tweetUsecase.RetrieveTimelineTweet(timelineTweetData)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+	}
+	ctx.JSON(http.StatusOK, timeline)
 }
 
 func validateAndGenerateTimelineTweetData(ctx *gin.Context) (*dto.TimelineTweetData, error) {
