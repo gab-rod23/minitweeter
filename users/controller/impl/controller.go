@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/gab-rod23/minitweeter/users/controller"
-	"github.com/gab-rod23/minitweeter/users/entities"
+	"github.com/gab-rod23/minitweeter/users/entities/dto"
 	"github.com/gab-rod23/minitweeter/users/usecase"
 	"github.com/gab-rod23/minitweeter/users/usecase/impl"
 )
@@ -23,7 +23,7 @@ func NewUserController() controller.UserController {
 }
 
 func (u userController) HandlerCreateNewUser(ctx *gin.Context) {
-	createUserRequestDto := new(entities.CreateUserRequestDTO)
+	createUserRequestDto := new(dto.CreateUserRequestDTO)
 	var err error
 
 	err = ctx.BindJSON(&createUserRequestDto)
@@ -31,7 +31,6 @@ func (u userController) HandlerCreateNewUser(ctx *gin.Context) {
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 	}
-
 	err = u.userUsecase.CreateNewUser(createUserRequestDto)
 
 	if err != nil {
@@ -41,7 +40,8 @@ func (u userController) HandlerCreateNewUser(ctx *gin.Context) {
 }
 
 func (u userController) HandlerFollowUser(ctx *gin.Context) {
-	followUserRequestDto := new(entities.FollowUserRequestDTO)
+	username := ctx.GetHeader("username")
+	followUserRequestDto := new(dto.FollowUserRequestDTO)
 	var err error
 
 	err = ctx.BindJSON(&followUserRequestDto)
@@ -50,7 +50,7 @@ func (u userController) HandlerFollowUser(ctx *gin.Context) {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 	}
 
-	err = u.userUsecase.FollowUser(followUserRequestDto)
+	err = u.userUsecase.FollowUser(username, followUserRequestDto)
 
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
@@ -58,10 +58,10 @@ func (u userController) HandlerFollowUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, nil)
 }
 
-func (u userController) HandlerRetrieveUserData(ctx *gin.Context) {
+func (u userController) HandlerRetrieveUserDataByUsername(ctx *gin.Context) {
 	username := ctx.GetHeader("username")
 	if len(username) == 0 {
-		ctx.AbortWithError(http.StatusBadRequest, errors.New("Se debe enviar un usuario valido"))
+		ctx.AbortWithError(http.StatusBadRequest, errors.New("se debe enviar un usuario valido"))
 	}
 	userData, err := u.userUsecase.RetrieveUserByUsername(username)
 	if err != nil {

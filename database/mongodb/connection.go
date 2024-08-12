@@ -40,3 +40,23 @@ func GetClient() *MongoDBConnection {
 func (c MongoDBConnection) GetCollection(name string) *mongo.Collection {
 	return c.client.Database("minitweeter").Collection(name)
 }
+
+func StartTransaction(ctx context.Context) (mongo.Session, error) {
+	var session mongo.Session
+	var err error
+	if session, err = conn.client.StartSession(); err != nil {
+		return nil, err
+	}
+	if err = session.StartTransaction(); err != nil {
+		return nil, err
+	}
+	return session, nil
+}
+
+func CommitTransaction(ctx context.Context, session mongo.Session) {
+	session.CommitTransaction(ctx)
+}
+
+func RollbackTransaction(ctx context.Context, session mongo.Session) {
+	session.AbortTransaction(ctx)
+}
