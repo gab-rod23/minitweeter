@@ -9,7 +9,6 @@ import (
 	"github.com/gab-rod23/minitweeter/tweets/repository/impl"
 	"github.com/gab-rod23/minitweeter/tweets/usecase"
 	userRepo "github.com/gab-rod23/minitweeter/users/repository"
-	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -30,7 +29,8 @@ func (t tweetUsecase) CreateNewTweet(newTweetData *dto.CreateTweetRequestDto, us
 	return nil
 }
 
-func (t tweetUsecase) RetrieveTimelineTweet(ctx *gin.Context) (*dto.TimelineTweetResponseDto, error) {
+func (t tweetUsecase) RetrieveTimelineTweet(*dto.TimelineTweetData) (*dto.TimelineTweetResponseDto, error) {
+
 	return nil, nil
 }
 
@@ -39,6 +39,6 @@ func generateTweet(newUserData *dto.CreateTweetRequestDto, username string) *mod
 		ID:          primitive.NewObjectID(),
 		Username:    username,
 		Text:        newUserData.Text,
-		CreatedDate: time.Now(),
+		CreatedDate: primitive.NewDateTimeFromTime(time.Now()),
 	}
 }
