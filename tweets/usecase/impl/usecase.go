@@ -11,6 +11,7 @@ import (
 	"github.com/gab-rod23/minitweeter/tweets/usecase"
 	userRepo "github.com/gab-rod23/minitweeter/users/repository"
 	userRepoImpl "github.com/gab-rod23/minitweeter/users/repository/impl"
+	"github.com/gab-rod23/minitweeter/util"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -28,14 +29,14 @@ func NewTweetUsecase() usecase.TweetUsecase {
 
 func (t tweetUsecase) CreateNewTweet(newTweetData *dto.CreateTweetRequestDto, username string) error {
 	tweetToInsert := generateTweet(newTweetData, username)
-	t.tweetRepository.InsertTweet(tweetToInsert)
-	return nil
+	err := t.tweetRepository.InsertTweet(tweetToInsert)
+	return err
 }
 
 func (t tweetUsecase) RetrieveTimelineTweet(timelineData *dto.TimelineTweetData) (*dto.TimelineTweetResponseDto, error) {
 	userData, err := t.userRepository.FindUserByField(timelineData.Username, "username")
 	if err != nil {
-		return nil, err
+		return nil, util.ErrUserNotFound
 	}
 	timelineResult, err := t.tweetRepository.FindTweetsFromUsers(timelineData, userData.Following)
 	if err != nil {
@@ -60,7 +61,7 @@ func generateTimelineResponse(timelineModel []model.TweetModelCollection) *dto.T
 	for _, item := range timelineModel {
 		itemResponse := &dto.TimelineTweetResponseItem{}
 		m.Mapper(&item, itemResponse)
-		itemResponse.CreatedDate = itemResponse.CreatedDate.Local()
+
 		tweetArray = append(tweetArray, *itemResponse)
 	}
 

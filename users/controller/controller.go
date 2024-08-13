@@ -7,6 +7,5 @@ import (
 type UserController interface {
 	HandlerCreateNewUser(ctx *gin.Context)
 	HandlerRetrieveUserDataByUsername(ctx *gin.Context)
-	HandlerRetrieveUserFollowData(ctx *gin.Context)
 	HandlerFollowUser(ctx *gin.Context)
 }

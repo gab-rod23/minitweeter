@@ -3,7 +3,7 @@ package impl
 import (
 	"context"
 	"errors"
-	"fmt"
+	"strings"
 	"time"
 
 	"github.com/gab-rod23/minitweeter/database/mongodb"
@@ -32,8 +32,8 @@ func NewUserUsecase() usecase.UserUsecase {
 
 func (u userUsecase) CreateNewUser(newUserData *dto.CreateUserRequestDTO) error {
 	userToInsert := generateUser(newUserData)
-	u.userRepository.InsertUser(userToInsert)
-	return nil
+	err := u.userRepository.InsertUser(userToInsert)
+	return getDetailedError(err)
 }
 
 func (u userUsecase) FollowUser(username string, followUserData *dto.FollowUserRequestDTO) error {
@@ -44,21 +44,22 @@ func (u userUsecase) FollowUser(username string, followUserData *dto.FollowUserR
 	}
 	defer util.Unlock(USERNAME_FIELD, usernameToFollow, impl.USERS_COLLECTION_NAME)
 	userDataToFollow, err := u.userRepository.FindUserByField(usernameToFollow, USERNAME_FIELD)
-	if userDataToFollow == nil {
-		return errors.New("usuario a seguir inexistente")
-	}
 	if err != nil {
-		return errors.New("error al recuperar el usuario a seguir")
+		if errors.Is(err, util.ErrUserNotFound) {
+			return util.ErrUserToFollowNotFound
+		}
+		return err
 	}
 
 	if errLock := util.Lock(USERNAME_FIELD, username, impl.USERS_COLLECTION_NAME); errLock != nil {
 		return errLock
 	}
 	defer util.Unlock(USERNAME_FIELD, username, impl.USERS_COLLECTION_NAME)
-	userData, _ := u.userRepository.FindUserByField(username, USERNAME_FIELD)
+	userData, err := u.userRepository.FindUserByField(username, USERNAME_FIELD)
+	if err != nil {
+		return err
+	}
 	for _, userFollowing := range userData.Following {
-		fmt.Print("Usuario siguiendo ")
-		fmt.Println(userFollowing)
 		if usernameToFollow == userFollowing {
 			return nil
 		}
@@ -68,20 +69,15 @@ func (u userUsecase) FollowUser(username string, followUserData *dto.FollowUserR
 		return err
 	}
 	userData.Following = append(userData.Following, usernameToFollow)
-	fmt.Println(userData.Following)
 	userDataToFollow.Followers = append(userDataToFollow.Followers, username)
-	fmt.Println(userDataToFollow.Followers)
 	if err := u.userRepository.AddNewFollowingToUser(username, USERNAME_FIELD, usernameToFollow); err != nil {
-		fmt.Println("error en following")
 		mongodb.RollbackTransaction(context.Background(), session)
 		return err
 	}
 	if err := u.userRepository.AddtNewFollowerToUser(usernameToFollow, USERNAME_FIELD, username); err != nil {
-		fmt.Println("error en followers")
 		mongodb.RollbackTransaction(context.Background(), session)
 		return err
 	}
-	fmt.Println("termino ok")
 	mongodb.CommitTransaction(context.Background(), session)
 
 	return nil
@@ -110,4 +106,16 @@ func generateUser(userData *dto.CreateUserRequestDTO) *model.UserModelCollection
 		Followers:   []string{},
 		Following:   []string{},
 	}
+}
+
+func getDetailedError(err error) error {
+	if strings.Contains(err.Error(), "duplicate key error") {
+		if strings.Contains(err.Error(), "index: email") {
+			return util.ErrEmailAlreadyExists
+		}
+		if strings.Contains(err.Error(), "index: username") {
+			return util.ErrUsernameAlreadyExists
+		}
+	}
+	return err
 }

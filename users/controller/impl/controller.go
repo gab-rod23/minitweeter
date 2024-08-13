@@ -10,6 +10,7 @@ import (
 	"github.com/gab-rod23/minitweeter/users/entities/dto"
 	"github.com/gab-rod23/minitweeter/users/usecase"
 	"github.com/gab-rod23/minitweeter/users/usecase/impl"
+	"github.com/gab-rod23/minitweeter/util"
 )
 
 type userController struct {
@@ -29,12 +30,16 @@ func (u userController) HandlerCreateNewUser(ctx *gin.Context) {
 	err = ctx.BindJSON(&createUserRequestDto)
 
 	if err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.JSON(http.StatusBadRequest, util.ErrInvalidRequest.Error())
 	}
 	err = u.userUsecase.CreateNewUser(createUserRequestDto)
-
 	if err != nil {
+		if err == util.ErrEmailAlreadyExists || err == util.ErrUsernameAlreadyExists {
+			ctx.JSON(http.StatusBadRequest, err.Error())
+			return
+		}
 		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
 	}
 	ctx.JSON(http.StatusCreated, nil)
 }
@@ -47,13 +52,18 @@ func (u userController) HandlerFollowUser(ctx *gin.Context) {
 	err = ctx.BindJSON(&followUserRequestDto)
 
 	if err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		ctx.JSON(http.StatusBadRequest, util.ErrInvalidRequest.Error())
+		return
 	}
 
 	err = u.userUsecase.FollowUser(username, followUserRequestDto)
-
 	if err != nil {
+		if errors.Is(err, util.ErrUserNotFound) || errors.Is(err, util.ErrUserToFollowNotFound) {
+			ctx.JSON(http.StatusNotFound, err.Error())
+			return
+		}
 		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
 	}
 	ctx.JSON(http.StatusOK, nil)
 }
@@ -61,15 +71,17 @@ func (u userController) HandlerFollowUser(ctx *gin.Context) {
 func (u userController) HandlerRetrieveUserDataByUsername(ctx *gin.Context) {
 	username := ctx.GetHeader("username")
 	if len(username) == 0 {
-		ctx.AbortWithError(http.StatusBadRequest, errors.New("se debe enviar un usuario valido"))
+		ctx.JSON(http.StatusBadRequest, util.ErrInvalidUser.Error())
+		return
 	}
 	userData, err := u.userUsecase.RetrieveUserByUsername(username)
 	if err != nil {
+		if errors.Is(err, util.ErrUserNotFound) {
+			ctx.JSON(http.StatusNotFound, err.Error())
+			return
+		}
 		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
 	}
 	ctx.JSON(http.StatusOK, userData)
-}
-
-func (u userController) HandlerRetrieveUserFollowData(ctx *gin.Context) {
-
 }

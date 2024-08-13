@@ -1,8 +1,6 @@
 package dto
 
-import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
-)
+import "time"
 
 type CreateTweetRequestDto struct {
 	Text string `json:"text"`
@@ -12,5 +10,5 @@ type TimelineTweetData struct {
 	Username          string
 	PageSize          int
 	PageNumber        int
-	LastPageTweetDate *primitive.DateTime
+	LastPageTweetDate *time.Time
 }

@@ -1,8 +1,6 @@
 package main
 
 import (
-	"net/http"
-
 	"github.com/gab-rod23/minitweeter/database/mongodb"
 	tweetControllerImpl "github.com/gab-rod23/minitweeter/tweets/controller/impl"
 	userControllerImpl "github.com/gab-rod23/minitweeter/users/controller/impl"
@@ -17,11 +15,6 @@ func main() {
 	userController := userControllerImpl.NewUserController()
 	tweetController := tweetControllerImpl.NewTweetController()
 	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
 	userRouterGroup := r.Group("/user")
 	{
 		userRouterGroup.POST("/create", userController.HandlerCreateNewUser)
@@ -35,5 +28,5 @@ func main() {
 		tweetRouterGroup.GET("/timeline", tweetController.HandlerRetrieveTimelineTweet)
 	}
 
-	r.Run("localhost:8080") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	r.Run("localhost:8080")
 }

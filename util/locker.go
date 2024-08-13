@@ -10,12 +10,14 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+const LOCK_RETRIES = 20
+
 func Lock(field string, value string, collectionName string) error {
 	collection := mongodb.GetClient().GetCollection("lock")
 	retries := 0
 	_, err := collection.InsertOne(context.TODO(), bson.D{{field, value}, {"collection_name", collectionName}})
 	for err != nil && mongo.IsDuplicateKeyError(err) {
-		if retries > 20 {
+		if retries > LOCK_RETRIES {
 			return errors.New("Lock timeout")
 		}
 		time.Sleep(500 * time.Microsecond)

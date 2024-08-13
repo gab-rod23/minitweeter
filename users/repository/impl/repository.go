@@ -2,12 +2,11 @@ package impl
 
 import (
 	"context"
-	"errors"
-	"fmt"
 
 	"github.com/gab-rod23/minitweeter/database/mongodb"
 	"github.com/gab-rod23/minitweeter/users/entities/model"
 	"github.com/gab-rod23/minitweeter/users/repository"
+	"github.com/gab-rod23/minitweeter/util"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -26,7 +25,6 @@ func NewUserRepository() repository.UserRepository {
 
 func (r userRepository) InsertUser(newUser *model.UserModelCollection) error {
 	userCollection := r.client.GetCollection(USERS_COLLECTION_NAME)
-	fmt.Println(newUser.CreatedDate)
 	_, err := userCollection.InsertOne(context.TODO(), newUser)
 	if err != nil {
 		return err
@@ -40,7 +38,7 @@ func (r userRepository) FindUserByField(value string, field string) (*model.User
 	err := userCollection.FindOne(context.TODO(), bson.D{{field, value}}).Decode(userData)
 	if err != nil {
 		if mongo.ErrNoDocuments == err {
-			return nil, errors.New("usuario no encontrado")
+			return nil, util.ErrUserNotFound
 		}
 		return nil, err
 	}
