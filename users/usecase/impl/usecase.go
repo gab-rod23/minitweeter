@@ -84,7 +84,10 @@ func (u userUsecase) FollowUser(username string, followUserData *dto.FollowUserR
 }
 
 func (u userUsecase) RetrieveUserByUsername(username string) (*dto.UseDataResponseDTO, error) {
-	userData, _ := u.userRepository.FindUserByField(username, USERNAME_FIELD)
+	userData, err := u.userRepository.FindUserByField(username, USERNAME_FIELD)
+	if err != nil {
+		return nil, err
+	}
 	userResponse := &dto.UseDataResponseDTO{
 		Username:    userData.Username,
 		Name:        userData.Name,
