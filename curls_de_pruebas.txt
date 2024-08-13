@@ -1,0 +1,40 @@
+Creacion de usuario:
+
+curl --location 'localhost:8080/user/create' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "username": "jorgelin",
+  "name": "Jorge Perez",
+  "mail": "jorge@hotmail.com"
+}'
+
+Seguir usuario:
+
+curl --location 'localhost:8080/user/follow' \
+--header 'username: gabirod92' \
+--header 'Content-Type: application/json' \
+--data '{
+  "username_to_follow": "user54"
+}'
+
+Obtener datos de usuario:
+
+curl --location --request GET 'localhost:8080/user/read' \
+--header 'username: gabirod92'
+
+Crear tweet:
+
+curl --location 'localhost:8080/tweet/create' \
+--header 'username: gabirod92' \
+--header 'Content-Type: application/json' \
+--data '{
+  "text": "este es mi tweet"
+}'
+
+Obtener timeline:
+
+curl --location --request GET 'localhost:8080/tweet/timeline' \
+--header 'username: gabirod92' \
+--header 'page_size: 2' \
+--header 'page_number: 0' \
+--header 'last_page_tweet_date: 2024-08-12T23:32:58.091Z'
