@@ -28,8 +28,12 @@ func NewTweetUsecase() usecase.TweetUsecase {
 }
 
 func (t tweetUsecase) CreateNewTweet(newTweetData *dto.CreateTweetRequestDto, username string) error {
+	_, err := t.userRepository.FindUserByField(username, "username")
+	if err != nil {
+		return err
+	}
 	tweetToInsert := generateTweet(newTweetData, username)
-	err := t.tweetRepository.InsertTweet(tweetToInsert)
+	err = t.tweetRepository.InsertTweet(tweetToInsert)
 	return err
 }
 

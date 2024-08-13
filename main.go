@@ -28,5 +28,5 @@ func main() {
 		tweetRouterGroup.GET("/timeline", tweetController.HandlerRetrieveTimelineTweet)
 	}
 
-	r.Run("localhost:8080")
+	r.Run("0.0.0.0:8080")
 }

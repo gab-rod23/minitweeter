@@ -15,8 +15,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const TWEET_LENGTH = 280
-
 type tweetController struct {
 	tweetUsecase usecase.TweetUsecase
 }
@@ -29,14 +27,18 @@ func NewTweetController() controller.TweetController {
 
 func (t tweetController) HandlerCreateNewTweet(ctx *gin.Context) {
 	username := ctx.GetHeader("username")
-	createNewTweet := new(dto.CreateTweetRequestDto)
-	if len(createNewTweet.Text) > TWEET_LENGTH {
-		ctx.JSON(http.StatusBadRequest, fmt.Sprintf("el tweet no puede superar los %d caracteres", TWEET_LENGTH))
-		return
+	if len(username) == 0 {
+		ctx.JSON(http.StatusBadRequest, util.ErrInvalidUser)
 	}
+	createNewTweet := new(dto.CreateTweetRequestDto)
 	err := ctx.BindJSON(createNewTweet)
+
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, util.ErrInvalidRequest.Error())
+		return
+	}
+	if len(createNewTweet.Text) > util.TWEET_LENGTH {
+		ctx.JSON(http.StatusBadRequest, fmt.Sprintf("el tweet no puede superar los %d caracteres", util.TWEET_LENGTH))
 		return
 	}
 	err = t.tweetUsecase.CreateNewTweet(createNewTweet, username)

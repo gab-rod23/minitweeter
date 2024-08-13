@@ -39,10 +39,10 @@ func (u userUsecase) CreateNewUser(newUserData *dto.CreateUserRequestDTO) error 
 func (u userUsecase) FollowUser(username string, followUserData *dto.FollowUserRequestDTO) error {
 
 	usernameToFollow := *followUserData.UsernameToFollow
-	if errLock := util.Lock(USERNAME_FIELD, usernameToFollow, impl.USERS_COLLECTION_NAME); errLock != nil {
+	if errLock := util.Lock(USERNAME_FIELD, usernameToFollow, util.USERS_COLLECTION_NAME); errLock != nil {
 		return errLock
 	}
-	defer util.Unlock(USERNAME_FIELD, usernameToFollow, impl.USERS_COLLECTION_NAME)
+	defer util.Unlock(USERNAME_FIELD, usernameToFollow, util.USERS_COLLECTION_NAME)
 	userDataToFollow, err := u.userRepository.FindUserByField(usernameToFollow, USERNAME_FIELD)
 	if err != nil {
 		if errors.Is(err, util.ErrUserNotFound) {
@@ -51,10 +51,10 @@ func (u userUsecase) FollowUser(username string, followUserData *dto.FollowUserR
 		return err
 	}
 
-	if errLock := util.Lock(USERNAME_FIELD, username, impl.USERS_COLLECTION_NAME); errLock != nil {
+	if errLock := util.Lock(USERNAME_FIELD, username, util.USERS_COLLECTION_NAME); errLock != nil {
 		return errLock
 	}
-	defer util.Unlock(USERNAME_FIELD, username, impl.USERS_COLLECTION_NAME)
+	defer util.Unlock(USERNAME_FIELD, username, util.USERS_COLLECTION_NAME)
 	userData, err := u.userRepository.FindUserByField(username, USERNAME_FIELD)
 	if err != nil {
 		return err
@@ -109,7 +109,7 @@ func generateUser(userData *dto.CreateUserRequestDTO) *model.UserModelCollection
 }
 
 func getDetailedError(err error) error {
-	if strings.Contains(err.Error(), "duplicate key error") {
+	if err != nil && strings.Contains(err.Error(), "duplicate key error") {
 		if strings.Contains(err.Error(), "index: email") {
 			return util.ErrEmailAlreadyExists
 		}

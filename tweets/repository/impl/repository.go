@@ -7,13 +7,12 @@ import (
 	"github.com/gab-rod23/minitweeter/tweets/entities/dto"
 	"github.com/gab-rod23/minitweeter/tweets/entities/model"
 	"github.com/gab-rod23/minitweeter/tweets/repository"
+	"github.com/gab-rod23/minitweeter/util"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
-
-const TWEET_COLLECTION_NAME = "tweets"
 
 type tweetRepository struct {
 	client *mongodb.MongoDBConnection
@@ -26,7 +25,7 @@ func NewTweetRepository() repository.TweetRepository {
 }
 
 func (t tweetRepository) InsertTweet(newTweet *model.TweetModelCollection) error {
-	tweetCollection := t.client.GetCollection(TWEET_COLLECTION_NAME)
+	tweetCollection := t.client.GetCollection(util.TWEET_COLLECTION_NAME)
 	_, err := tweetCollection.InsertOne(context.TODO(), newTweet)
 	if err != nil {
 		return err
@@ -35,7 +34,7 @@ func (t tweetRepository) InsertTweet(newTweet *model.TweetModelCollection) error
 }
 
 func (t tweetRepository) FindTweetsFromUsers(timelineData *dto.TimelineTweetData, followingUsers []string) ([]model.TweetModelCollection, error) {
-	tweetCollection := t.client.GetCollection(TWEET_COLLECTION_NAME)
+	tweetCollection := t.client.GetCollection(util.TWEET_COLLECTION_NAME)
 
 	var limitValue int64
 	var skipValue int64

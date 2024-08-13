@@ -11,8 +11,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-const USERS_COLLECTION_NAME = "users"
-
 type userRepository struct {
 	client *mongodb.MongoDBConnection
 }
@@ -24,7 +22,7 @@ func NewUserRepository() repository.UserRepository {
 }
 
 func (r userRepository) InsertUser(newUser *model.UserModelCollection) error {
-	userCollection := r.client.GetCollection(USERS_COLLECTION_NAME)
+	userCollection := r.client.GetCollection(util.USERS_COLLECTION_NAME)
 	_, err := userCollection.InsertOne(context.TODO(), newUser)
 	if err != nil {
 		return err
@@ -34,7 +32,7 @@ func (r userRepository) InsertUser(newUser *model.UserModelCollection) error {
 
 func (r userRepository) FindUserByField(value string, field string) (*model.UserModelCollection, error) {
 	userData := new(model.UserModelCollection)
-	userCollection := r.client.GetCollection(USERS_COLLECTION_NAME)
+	userCollection := r.client.GetCollection(util.USERS_COLLECTION_NAME)
 	err := userCollection.FindOne(context.TODO(), bson.D{{field, value}}).Decode(userData)
 	if err != nil {
 		if mongo.ErrNoDocuments == err {
@@ -54,7 +52,7 @@ func (r userRepository) AddNewFollowingToUser(valueFilter string, fieldFilter st
 }
 
 func (r userRepository) pushValueIntoArray(valueFilter string, fieldFilter string, arrayName string, valueToPush string) error {
-	userCollection := r.client.GetCollection(USERS_COLLECTION_NAME)
+	userCollection := r.client.GetCollection(util.USERS_COLLECTION_NAME)
 	_, err := userCollection.UpdateOne(context.TODO(), bson.D{{Key: fieldFilter, Value: valueFilter}}, bson.D{{"$push", bson.D{{arrayName, valueToPush}}}})
 	return err
 }
