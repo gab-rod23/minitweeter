@@ -11,3 +11,6 @@ Por ultimo, en una terminal y estando ubicados en la misma carpeta que el archiv
 
 ### Dockerizada
 Para poder correr la aplicación de manera dockerizada se necesita tener instalado y corriendo docker en la maquina. Una vez hecho esto, mediante una termina ubicarse en la misma carpeta que los archivos **dockerfile** y **docker-compose.yml**, y ejecutar el comando `docker compose up` para levantar el contenedor.
+
+## Pruebas
+Dentro del repositorio se encuentra el archivo **curls_de_pruebas** que contiene distintas cURLS para probar los endpoints de la aplicación. 
