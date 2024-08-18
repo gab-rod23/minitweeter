@@ -7,6 +7,6 @@ import (
 type UserRepository interface {
 	InsertUser(newUser *model.UserModelCollection) error
 	FindUserByField(value string, field string) (*model.UserModelCollection, error)
-	AddtNewFollowerToUser(valueFilter string, fieldFilter string, followerUsername string) error
+	AddNewFollowerToUser(valueFilter string, fieldFilter string, followerUsername string) error
 	AddNewFollowingToUser(valueFilter string, fieldFilter string, followingUsername string) error
 }

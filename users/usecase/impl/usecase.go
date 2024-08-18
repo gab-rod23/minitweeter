@@ -74,7 +74,7 @@ func (u userUsecase) FollowUser(username string, followUserData *dto.FollowUserR
 		mongodb.RollbackTransaction(context.Background(), session)
 		return err
 	}
-	if err := u.userRepository.AddtNewFollowerToUser(usernameToFollow, USERNAME_FIELD, username); err != nil {
+	if err := u.userRepository.AddNewFollowerToUser(usernameToFollow, USERNAME_FIELD, username); err != nil {
 		mongodb.RollbackTransaction(context.Background(), session)
 		return err
 	}

@@ -43,7 +43,7 @@ func (r userRepository) FindUserByField(value string, field string) (*model.User
 	return userData, nil
 }
 
-func (r userRepository) AddtNewFollowerToUser(valueFilter string, fieldFilter string, followerUsername string) error {
+func (r userRepository) AddNewFollowerToUser(valueFilter string, fieldFilter string, followerUsername string) error {
 	return r.pushValueIntoArray(valueFilter, fieldFilter, "followers", followerUsername)
 }
 
