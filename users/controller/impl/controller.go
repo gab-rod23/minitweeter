@@ -10,6 +10,7 @@ import (
 	"github.com/gab-rod23/minitweeter/users/entities/dto"
 	"github.com/gab-rod23/minitweeter/users/usecase"
 	"github.com/gab-rod23/minitweeter/users/usecase/impl"
+	"github.com/gab-rod23/minitweeter/users/usecase/mock"
 	"github.com/gab-rod23/minitweeter/util"
 )
 
@@ -20,6 +21,12 @@ type userController struct {
 func NewUserController() controller.UserController {
 	return &userController{
 		userUsecase: impl.NewUserUsecase(),
+	}
+}
+
+func NewUserControllerWithMocks(m mock.UserUsecaseMock) controller.UserController {
+	return &userController{
+		userUsecase: m,
 	}
 }
 

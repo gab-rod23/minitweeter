@@ -2,7 +2,6 @@ package mock
 
 import (
 	"github.com/gab-rod23/minitweeter/users/entities/dto"
-	"github.com/gab-rod23/minitweeter/users/usecase"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -10,9 +9,18 @@ type usecaseMock struct {
 	mock *mock.Mock
 }
 
-func NewUserUsecaseMock(m *mock.Mock) usecase.UserUsecase {
+type UserUsecaseMock interface {
+	PatchCreateNewUser(newUserData *dto.CreateUserRequestDTO, expectedErr error)
+	CreateNewUser(newUserData *dto.CreateUserRequestDTO) error
+	PatchFollowUser(username string, followUserData *dto.FollowUserRequestDTO, expectedErr error)
+	FollowUser(username string, followUserData *dto.FollowUserRequestDTO) error
+	PatchRetrieveUserByUsername(username string, response *dto.UseDataResponseDTO, expectedErr error)
+	RetrieveUserByUsername(username string) (*dto.UseDataResponseDTO, error)
+}
+
+func NewUserUsecaseMock() UserUsecaseMock {
 	return &usecaseMock{
-		mock: m,
+		mock: &mock.Mock{},
 	}
 }
 
