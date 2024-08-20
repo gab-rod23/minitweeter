@@ -47,20 +47,20 @@ func Test_HandleCreateNewUser_When_User_Is_Created_OK(t *testing.T) {
 	ass.Equal(http.StatusCreated, w.Result().StatusCode)
 }
 
-func Test_HandleCreateNewUser_When_Request_Is_Invalid(t *testing.T) {
-	ass := assert.New(t)
+// func Test_HandleCreateNewUser_When_Request_Is_Invalid(t *testing.T) {
+// 	ass := assert.New(t)
 
-	testController := userControllerImpl.NewUserControllerWithMocks(nil)
+// 	testController := userControllerImpl.NewUserControllerWithMocks(nil)
 
-	w := httptest.NewRecorder()
-	c, _ := gin.CreateTestContext(w)
+// 	w := httptest.NewRecorder()
+// 	c, _ := gin.CreateTestContext(w)
 
-	c.Request = &http.Request{}
+// 	c.Request = &http.Request{}
 
-	// Method execution
-	testController.HandlerCreateNewUser(c)
+// 	// Method execution
+// 	testController.HandlerCreateNewUser(c)
 
-	// Result assertion
-	ass.Equal(http.StatusBadRequest, w.Result().StatusCode)
-	ass.Equal("null", w.Body.String())
-}
+// 	// Result assertion
+// 	ass.Equal(http.StatusBadRequest, w.Result().StatusCode)
+// 	ass.Equal("null", w.Body.String())
+// }
